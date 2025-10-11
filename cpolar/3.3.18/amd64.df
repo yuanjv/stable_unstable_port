@@ -1,6 +1,6 @@
 #tok+ip:port+port
 
-FROM busybox:1.36.1-uclibc
+FROM busybox:1.36.1-musl
 
 #RUN wget https://www.cpolar.com/static/downloads/releases/3.3.18/cpolar-stable-linux-arm.zip -O /dev/shm/cpolar.zip && unzip /dev/shm/cpolar.zip -d / && rm /dev/shm/cpolar.zip
 
@@ -13,4 +13,3 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     chmod 700 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-  
