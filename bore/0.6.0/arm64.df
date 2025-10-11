@@ -9,7 +9,7 @@ RUN wget https://github.com/ekzhang/bore/releases/download/v0.6.0/bore-v0.6.0-aa
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'nc -l -p 1024 -e nc $1 &' >> /entrypoint.sh && \
     echo 'sleep 32 && while true; do tail -n 1 /dev/shm/ip_port | nc -l -p $2; done &' >> /entrypoint.sh && \
-    ehco '/bore local 1024 -t bore.pub | sed -n '\''/listening at/{s/.* //;p}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
+    echo '/bore local 1024 -t bore.pub | sed -n '\''/listening at/{s/.* //;p}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
     chmod 700 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
