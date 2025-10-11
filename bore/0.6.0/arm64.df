@@ -1,15 +1,15 @@
-#tok+ip:port+port
+#ip:port+port
 
 FROM busybox:1.36.1-uclibc
 
-RUN wget https://www.cpolar.com/static/downloads/releases/3.3.18/cpolar-stable-linux-arm.zip -O /dev/shm/cpolar.zip && unzip /dev/shm/cpolar.zip -d / && rm /dev/shm/cpolar.zip
-
-#RUN wget https://www.cpolar.com/static/downloads/releases/3.3.18/cpolar-stable-linux-amd64.zip -O /dev/shm/cpolar.zip && unzip /dev/shm/cpolar.zip -d / && rm /dev/shm/cpolar.zip
+RUN wget https://github.com/ekzhang/bore/releases/download/v0.6.0/bore-v0.6.0-aarch64-unknown-linux-musl.tar.gz -O /dev/shm/bore.tgz && \
+    tar xzf /dev/shm/bore.tgz -C / && \
+    rm /dev/shm/bore.tgz
 
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
-    echo '/cpolar authtoken $1' >> /entrypoint.sh && \
-    echo 'sleep 32 && while true; do tail -n 1 /dev/shm/ip_port | nc -l -p $3; done &' >> /entrypoint.sh && \
-    echo '/cpolar tcp $2 --log=stdout | sed -n '\''/level=info/{/tcp:\/\//{s/.*tcp:\/\///;s/"$//;p}}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
+    echo 'nc -l -p 1024 -e nc $1 &'
+    echo 'sleep 32 && while true; do tail -n 1 /dev/shm/ip_port | nc -l -p $2; done &' >> /entrypoint.sh && \
+    ehco '/bore local 1024 -t bore.pub | sed -n '\''/listening at/{s/.* //;p}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
     chmod 700 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
