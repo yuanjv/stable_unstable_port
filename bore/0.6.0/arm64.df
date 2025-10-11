@@ -1,4 +1,4 @@
-#ip:port+port
+#ip+port+port
 
 FROM busybox:1.36.1-musl
 
@@ -6,10 +6,13 @@ RUN wget https://github.com/ekzhang/bore/releases/download/v0.6.0/bore-v0.6.0-aa
     tar xzf /dev/shm/bore.tgz -C / && \
     rm /dev/shm/bore.tgz
 
+
+# running bore in a none tty env will buf the stdout
+# failed to get ip:port until flushed which unlikely to happen in a short interval (nothing gonna show until someone scan the port)
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
-    echo 'nc -l -p 1024 -e nc $1 &' >> /entrypoint.sh && \
-    echo 'sleep 32 && while true; do tail -n 1 /dev/shm/ip_port | nc -l -p $2; done &' >> /entrypoint.sh && \
-    echo '/bore local 1024 -t bore.pub | sed -n '\''/listening at/{s/.* //;p}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
+    #echo 'nc -l -p 1024 -e nc $1 &' >> /entrypoint.sh && \
+    echo 'sleep 32 && while true; do tail -n 1 /dev/shm/ip_port | nc -l -p $3; done &' >> /entrypoint.sh && \
+    echo '/bore local $2 -t bore.pub -l $1 | sed -n '\''/listening at/{s/.* //;p}'\'' > /dev/shm/ip_port' >> /entrypoint.sh && \
     chmod 700 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
